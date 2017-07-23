@@ -1,0 +1,44 @@
+<project name="Project" default="compile" basedir=".">
+	<path id="classpath">
+		<fileset dir="lib" includes="**/*.jar"/>
+		<fileset dir="libtest" includes="**/*.jar"/>
+		<pathelement path="build"/>
+	</path>
+
+	<target name="clean">
+		<delete dir="build"/>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="build"/>
+		<javac srcdir="src" destdir="build" classpathref="classpath"/>
+		<copy todir="build">
+			<fileset dir="resources" excludes="**/*.java"/>
+		</copy>
+		<javac srcdir="test" destdir="build" classpathref="classpath"/>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="dist"/>
+		<jar destfile="dist/jshellscriptengine.jar" basedir="build">
+			<fileset dir="build"/>
+			<restrict>
+				<archives>
+					<zips>
+						<fileset dir="lib" includes="**/*.jar"/>
+					</zips>
+				</archives>
+			</restrict>
+		</jar>
+	</target>
+
+	<target name="junit" depends="compile">
+		<junit fork="true" logfailedtests="false">
+			<classpath refid="classpath"/>
+			<batchtest>
+				<fileset dir="test" includes="**/*Test.java"/>
+				<formatter type="plain" usefile="false"/>
+			</batchtest>
+		</junit>
+	</target>
+</project>
