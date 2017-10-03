@@ -30,6 +30,7 @@ import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.Snippet;
 import jdk.jshell.Snippet.Status;
+import jdk.jshell.SourceCodeAnalysis.CompletionInfo;
 import jdk.jshell.SnippetEvent;
 import jdk.jshell.VarSnippet;
 import jdk.jshell.execution.DirectExecutionControl;
@@ -184,7 +185,7 @@ public class JShellScriptEngine implements ScriptEngine {
 			Bindings globalBindings = context.getBindings(ScriptContext.GLOBAL_SCOPE);
 			
 			writeVariableValues(getCombinedVariables(globalBindings, bindings));
-			List<SnippetEvent> events = jshell.eval(script);
+			List<SnippetEvent> events = evalAll(script);
 			try {
 				for(SnippetEvent event:events) {
 					if(event.exception() != null) {
@@ -229,6 +230,26 @@ public class JShellScriptEngine implements ScriptEngine {
 		return null;
 	}
 	
+	/**
+	 * Split script into snippets and evaluate them all, returning the last result.
+	 */
+	private List<SnippetEvent> evalAll(String script) throws ScriptException {
+		while(true) {
+			CompletionInfo completionInfo = jshell.sourceCodeAnalysis().analyzeCompletion(script);
+			if(!completionInfo.completeness().isComplete()) {
+				throw new ScriptException("Incomplete script");
+			}
+	
+			List<SnippetEvent> result = jshell.eval(completionInfo.source());
+			
+			script = completionInfo.remaining();
+			
+			if(script.isEmpty()) {
+				return result;
+			}
+		}
+	}
+
 	/**
 	 * Returns the original exception to the type original.getExceptionClassName() if possible, otherwise
 	 * returns the original exception.
