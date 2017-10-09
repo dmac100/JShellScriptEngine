@@ -29,6 +29,24 @@ public class JShellScriptEngineTest {
 	}
 	
 	@Test
+	public void persistList() throws Exception {
+		scriptEngine.eval("java.util.List<Integer> x = java.util.Arrays.asList(1, 2, 3)");
+		assertEquals(1, scriptEngine.eval("x.get(0)"));
+	}
+	
+	@Test
+	public void persistInteger() throws Exception {
+		scriptEngine.eval("Integer x = 2;");
+		assertEquals(2, scriptEngine.eval("x"));
+	}
+	
+	@Test
+	public void persistArray() throws Exception {
+		scriptEngine.eval("int[] x = { 1, 2, 3 };");
+		assertEquals(1, scriptEngine.eval("x[0]"));
+	}
+	
+	@Test
 	public void multipleStatements() throws Exception {
 		assertEquals(2, scriptEngine.eval("int x = 2; x;"));
 	}

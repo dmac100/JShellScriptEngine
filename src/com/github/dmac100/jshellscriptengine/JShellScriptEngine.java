@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,8 @@ import jdk.jshell.JShell;
 import jdk.jshell.JShellException;
 import jdk.jshell.Snippet;
 import jdk.jshell.Snippet.Status;
-import jdk.jshell.SourceCodeAnalysis.CompletionInfo;
 import jdk.jshell.SnippetEvent;
+import jdk.jshell.SourceCodeAnalysis.CompletionInfo;
 import jdk.jshell.VarSnippet;
 import jdk.jshell.execution.DirectExecutionControl;
 import jdk.jshell.spi.ExecutionControl;
@@ -274,10 +275,29 @@ public class JShellScriptEngine implements ScriptEngine {
 	private void writeVariableValues(Map<String, Object> variables) {
 		JShellScriptEngine.variables.set(variables);
 		variables.forEach((name, value) -> {
-			jshell.eval("Object " + name + " = " + JShellScriptEngine.class.getName() + ".getBindingValue(\"" + name + "\");");
+			String type = getDeclaredType(value.getClass());
+			String command = String.format("%s %s = (%s) %s.getBindingValue(\"%s\");", type, name, type, JShellScriptEngine.class.getName(), name);
+			List<SnippetEvent> events = jshell.eval(command);
+			for(SnippetEvent event:events) {
+				if(event.status() == Status.REJECTED) {
+					Diag diag = jshell.diagnostics(event.snippet()).findAny().get();
+					throw new RuntimeException(diag.getPosition() + ": " + diag.getMessage(null));
+				}
+			}
 		});
 	}
 	
+	/**
+	 * Returns the string to declare a type of clazz.
+	 */
+	private static String getDeclaredType(Class<?> clazz) {
+		if((clazz.getModifiers() & Modifier.PRIVATE) > 0) {
+			clazz = clazz.getSuperclass();
+		}
+		
+		return clazz.getCanonicalName();
+	}
+
 	/**
 	 * Called from script to retrieve values from the bindings.
 	 */
