@@ -311,6 +311,9 @@ public class JShellScriptEngine implements ScriptEngine {
 	 * Called from script to retrieve values from the bindings.
 	 */
 	public static Object getBindingValue(String name) {
+		if(name.equals("__")) {
+			name = "_";
+		}
 		return variables.get().get(name);
 	}
 

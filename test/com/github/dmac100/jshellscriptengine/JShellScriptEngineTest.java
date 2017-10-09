@@ -69,6 +69,12 @@ public class JShellScriptEngineTest {
 		assertEquals(2, scriptEngine.eval("x"));
 	}
 	
+	@Test
+	public void setBindingsValueUnderscore() throws Exception {
+		scriptEngine.getBindings(ENGINE_SCOPE).put("_", 2);
+		assertEquals(2, scriptEngine.eval("__"));
+	}
+	
 	@Test(expected=IOException.class)
 	public void throwException() throws Throwable {
 		try {
