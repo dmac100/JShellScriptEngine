@@ -47,6 +47,12 @@ public class JShellScriptEngineTest {
 	}
 	
 	@Test
+	public void persistNull() throws Exception {
+		scriptEngine.eval("Object x = null;");
+		assertEquals(null, scriptEngine.eval("x"));
+	}
+	
+	@Test
 	public void multipleStatements() throws Exception {
 		assertEquals(2, scriptEngine.eval("int x = 2; x;"));
 	}

@@ -278,7 +278,7 @@ public class JShellScriptEngine implements ScriptEngine {
 			if(name.equals("_")) {
 				name = "__";
 			}
-			String type = getDeclaredType(value.getClass());
+			String type = getDeclaredType(value);
 			String command = String.format("%s %s = (%s) %s.getBindingValue(\"%s\");", type, name, type, JShellScriptEngine.class.getName(), name);
 			List<SnippetEvent> events = jshell.eval(command);
 			for(SnippetEvent event:events) {
@@ -293,7 +293,13 @@ public class JShellScriptEngine implements ScriptEngine {
 	/**
 	 * Returns the string to declare a type of clazz.
 	 */
-	private static String getDeclaredType(Class<?> clazz) {
+	private static String getDeclaredType(Object value) {
+		if(value == null) {
+			return "java.lang.Object";
+		}
+		
+		Class<?> clazz = value.getClass();
+		
 		if((clazz.getModifiers() & Modifier.PRIVATE) > 0) {
 			clazz = clazz.getSuperclass();
 		}
