@@ -275,6 +275,9 @@ public class JShellScriptEngine implements ScriptEngine {
 	private void writeVariableValues(Map<String, Object> variables) {
 		JShellScriptEngine.variables.set(variables);
 		variables.forEach((name, value) -> {
+			if(name.equals("_")) {
+				name = "__";
+			}
 			String type = getDeclaredType(value.getClass());
 			String command = String.format("%s %s = (%s) %s.getBindingValue(\"%s\");", type, name, type, JShellScriptEngine.class.getName(), name);
 			List<SnippetEvent> events = jshell.eval(command);
