@@ -53,6 +53,12 @@ public class JShellScriptEngineTest {
 	}
 	
 	@Test
+	public void persistLambda() throws Exception {
+		scriptEngine.eval("java.util.function.Supplier<Integer> x = () -> 1;");
+		assertEquals(1, scriptEngine.eval("x.get()"));
+	}
+	
+	@Test
 	public void multipleStatements() throws Exception {
 		assertEquals(2, scriptEngine.eval("int x = 2; x;"));
 	}

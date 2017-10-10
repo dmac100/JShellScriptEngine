@@ -293,18 +293,47 @@ public class JShellScriptEngine implements ScriptEngine {
 	/**
 	 * Returns the string to declare a type of clazz.
 	 */
-	private static String getDeclaredType(Object value) {
+	public static String getDeclaredType(Object value) {
 		if(value == null) {
 			return "java.lang.Object";
 		}
 		
-		Class<?> clazz = value.getClass();
-		
-		if((clazz.getModifiers() & Modifier.PRIVATE) > 0) {
-			clazz = clazz.getSuperclass();
+		// Try all super classes.
+		for(Class<?> clazz = value.getClass(); clazz != Object.class; clazz = clazz.getSuperclass()) {
+			if(isValidDeclarationType(clazz)) {
+				return clazz.getCanonicalName();
+			}
 		}
 		
-		return clazz.getCanonicalName();
+		// Try interface types on all super classes.
+		for(Class<?> clazz = value.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
+			for(Class<?> interfaceClass:clazz.getInterfaces()) {
+				if(isValidDeclarationType(interfaceClass)) {
+					return interfaceClass.getCanonicalName();
+				}
+			}
+		}
+		
+		return "java.lang.Object";
+	}
+	
+	/**
+	 * Returns whether clazz can be used as a variable declaration type.
+	 */
+	private static boolean isValidDeclarationType(Class<?> clazz) {
+		if((clazz.getModifiers() & Modifier.PRIVATE) > 0) {
+			return false;
+		}
+		
+		if(clazz.getCanonicalName() == null) {
+			return false;
+		}
+		
+		if(clazz.getCanonicalName().contains("/")) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	/**
