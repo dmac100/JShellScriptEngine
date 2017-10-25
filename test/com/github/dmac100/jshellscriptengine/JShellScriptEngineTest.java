@@ -90,6 +90,15 @@ public class JShellScriptEngineTest {
 		}
 	}
 	
+	@Test(expected=NullPointerException.class)
+	public void throwExceptionNoCause() throws Throwable {
+		try {
+			scriptEngine.eval("throw new NullPointerException();");
+		} catch(ScriptException e) {
+			throw e.getCause();
+		}
+	}
+	
 	@Test
 	public void setWriter() throws Exception {
 		ByteArrayOutputStream byteArray = new ByteArrayOutputStream();

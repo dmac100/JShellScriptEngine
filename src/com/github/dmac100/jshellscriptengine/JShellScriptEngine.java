@@ -258,11 +258,39 @@ public class JShellScriptEngine implements ScriptEngine {
 	private static Exception convertJShellException(EvalException original) {
 		try {
 			Class<?> exceptionClass = Class.forName(original.getExceptionClassName());
-			if( Exception.class.isAssignableFrom(exceptionClass)) {
-				Constructor<?> constructor = exceptionClass.getConstructor(String.class, Throwable.class);
-				Exception exception = (Exception) constructor.newInstance(original.getMessage(), original.getCause());
-				exception.setStackTrace(original.getStackTrace());
-				return exception;
+			if(Exception.class.isAssignableFrom(exceptionClass)) {
+				try {
+					// Try message and cause.
+					Constructor<?> constructor = exceptionClass.getConstructor(String.class, Throwable.class);
+					Exception exception = (Exception) constructor.newInstance(original.getMessage(), original.getCause());
+					exception.setStackTrace(original.getStackTrace());
+					return exception;
+				} catch(ReflectiveOperationException e2) {
+				}
+				try {
+					// Try message only.
+					Constructor<?> constructor = exceptionClass.getConstructor(String.class);
+					Exception exception = (Exception) constructor.newInstance(original.getMessage());
+					exception.setStackTrace(original.getStackTrace());
+					return exception;
+				} catch(ReflectiveOperationException e2) {
+				}
+				try {
+					// Try cause only.
+					Constructor<?> constructor = exceptionClass.getConstructor(Throwable.class);
+					Exception exception = (Exception) constructor.newInstance(original.getCause());
+					exception.setStackTrace(original.getStackTrace());
+					return exception;
+				} catch(ReflectiveOperationException e2) {
+				}
+				try {
+					// Try no arguments.
+					Constructor<?> constructor = exceptionClass.getConstructor();
+					Exception exception = (Exception) constructor.newInstance();
+					exception.setStackTrace(original.getStackTrace());
+					return exception;
+				} catch(ReflectiveOperationException e2) {
+				}
 			}
 		} catch(ReflectiveOperationException e2) {
 		}
