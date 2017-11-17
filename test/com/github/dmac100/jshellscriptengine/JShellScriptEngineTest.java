@@ -159,4 +159,12 @@ public class JShellScriptEngineTest {
 		assertEquals(2, scriptEngine.getBindings(GLOBAL_SCOPE).get("x"));
 		assertEquals(4, scriptEngine.getBindings(ENGINE_SCOPE).get("x"));
 	}
+	
+	@Test
+	public void invalidBindings() throws Exception {
+		scriptEngine.setBindings(new SimpleBindings(), GLOBAL_SCOPE);
+		scriptEngine.getBindings(GLOBAL_SCOPE).put("a.b", 2);
+		
+		assertEquals(1, scriptEngine.eval("1"));
+	}
 }
