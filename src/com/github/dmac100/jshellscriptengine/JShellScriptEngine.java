@@ -321,7 +321,7 @@ public class JShellScriptEngine implements ScriptEngine {
 	}
 	
 	/**
-	 * Returns the string to declare a type of clazz.
+	 * Returns the string to declare a type of value's type.
 	 */
 	public static String getDeclaredType(Object value) {
 		if(value == null) {
