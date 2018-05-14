@@ -3,6 +3,7 @@ package com.github.dmac100.jshellscriptengine;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
@@ -132,6 +133,9 @@ public class JShellScriptEngine implements ScriptEngine {
 	
 	public JShellScriptEngine(Bindings globalBindings) {
 		setBindings(globalBindings, ScriptContext.GLOBAL_SCOPE);
+		for (final String str : System.getProperty("java.class.path").split(File.pathSeparator)) {
+			jshell.addToClasspath(str);
+		}
 	}
 
 	@Override
