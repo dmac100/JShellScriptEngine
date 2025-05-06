@@ -167,4 +167,10 @@ public class JShellScriptEngineTest {
 		
 		assertEquals(1, scriptEngine.eval("1"));
 	}
+	
+	@Test
+	public void inaccesibleType() throws Exception {
+		scriptEngine.eval("var x = java.util.List.of(1)");
+		scriptEngine.eval("x");
+	}
 }

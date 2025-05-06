@@ -1,9 +1,9 @@
 package com.github.dmac100.jshellscriptengine;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.lang.reflect.Constructor;
@@ -355,7 +355,7 @@ public class JShellScriptEngine implements ScriptEngine {
 	 * Returns whether clazz can be used as a variable declaration type.
 	 */
 	private static boolean isValidDeclarationType(Class<?> clazz) {
-		if((clazz.getModifiers() & Modifier.PRIVATE) > 0) {
+		if((clazz.getModifiers() & Modifier.PUBLIC) == 0) {
 			return false;
 		}
 		
